@@ -1,0 +1,75 @@
+# params_version: 1.0.0
+# phase: voyager1
+# kind: version
+# description: Voyager 1 template as shipped by module 3D_phase_1 v1.1.0 (the file vicarius/modules/3D_phase_1/github_repo/analysis_params.yaml, unchanged), seeded as the first default of voyagerparams
+# saved_at: 2026-09-04T00:29:31-04:00
+# saved_by: LO
+# 3D_phase_1 v1.0.0 analysis parameters. Every key under `processing` is
+# read by config.py, step0.py, step1.py, scale_utils.py, or
+# selection_utils.py; module.yaml's `parameters:` block exposes the curated
+# UI subset and writes values back into this file on launch (see
+# ui.params_writethrough there). TCRMP registry mode is the module default.
+
+project:
+  name: "base run" # overridden by the run's directory name at launch time
+  notes: "" # free-text run notes; carried through to PROJECT_NOTES, informational only
+
+processing:
+  tcrmp: true # registry-driven mode: select timepoints from the TCRMP 3D registry
+  frames_per_transect: 1000 # frames step0 extracts per source video
+  max_chunks_per_psx: 4 # chunks appended to one psx before a new range-named psx starts
+  use_gpu: true # GPU acceleration for Metashape matching and alignment
+  min_free_disk_gb: 200 # last-line disk guard: a step is skipped when the drive holding the processing folder has fewer GB free than this; 0 turns the check off (the sync driver is expected to manage space)
+
+  metashape:
+    defaults:
+      downscale: 1 # photo downscale for matching; 1 = full resolution
+      keypoint_limit: 40000 # maximum keypoints detected per image
+      tiepoint_limit: 0 # maximum tie points kept per image pair; 0 = unlimited
+      generic_preselection: false # do not use image content to pre-select pairs
+      reference_preselection: false # do not use image metadata to pre-select pairs
+      filter_stationary_points: true # drop tie points that do not move between cameras
+      adaptive_fitting: false # do not adaptively fit camera parameters while optimizing
+      fit_k4: false # do not fit the 4th radial distortion coefficient
+      reconstruction_uncertainty: 15 # RU threshold for capped iterative selection
+      projection_accuracy: 5 # PA threshold for capped iterative selection
+      reprojection_error: 0.5 # RE threshold for capped iterative selection
+      depth_downscale: 1 # depth map downscale; 1 = Ultra High quality
+      depth_filter_mode: "MildFiltering" # depth map filtering strength
+      max_neighbors: 16 # neighboring-image count used to build each depth map
+      surface_type: "Arbitrary" # freeform mesh surface, not a flat height field
+      face_count: "HighFaceCount" # target face count preset for the initial build
+      interpolation: "EnabledInterpolation" # depth interpolation during buildModel
+      vertex_colors: false # do not calculate per-vertex mesh colors
+      mapping_mode: "GenericMapping" # UV mapping mode used by buildUV
+      texture_type: "DiffuseMap" # texture channel produced by buildTexture
+      blending_mode: "MosaicBlending" # how overlapping images blend into the texture
+      fill_holes: true # fill small holes left in the texture
+      ghosting_filter: true # filter ghosting artifacts caused by moving subjects
+      enable_texture_gpu: false # build the texture on CPU; GPU is freed during this step
+      fix_borders: true # keep the mesh's outer border fixed while smoothing
+      preserve_edges: false # do not preserve sharp edges while smoothing
+
+  step1_products:
+    gradual_selection_mode: "capped" # capped iterative selection (internal value; code branches on it)
+    scale_in_step1: true # detect coded targets and apply the scale bars after the model builds
+    build_dem: true # build a DEM from the Ultra High depth maps and keep it in the psx
+    dem_resolution: 0 # DEM resolution in metres per pixel; 0 = native
+    delete_depth_maps: true # remove depth maps from the chunk once the DEM is built
+    decimation_factor: 10 # delivery mesh = full mesh faces divided by this factor
+    smooth_strength: 4 # smoothing strength applied to the decimated delivery mesh
+    texture_pixel_size: 0.0005 # target metres per texel for scaled models; sets page count
+    unscaled_page_count: 4 # fixed 8192-pixel texture pages when Scale is not PASS
+
+  model_processing:
+    has_coded_scales: true # the model carries coded scale-bar targets
+    scale_bars: # the two 0.75 m bars used to apply real-world scale
+      - start_marker: "target 1000"
+        end_marker: "target 1010"
+        distance: 0.75
+      - start_marker: "target 1020"
+        end_marker: "target 1030"
+        distance: 0.75
+    remove_unlisted_markers: true # remove any detected target not listed in scale_bars
+    marker_projection_prune: true # prune each marker's worst-error projection until under threshold
+    scale_error_threshold: 0.009 # maximum acceptable scale error in metres (9 mm)

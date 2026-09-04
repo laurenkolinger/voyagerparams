@@ -1,0 +1,44 @@
+# ==============================================================================
+# MODULE INTERFACE DEFINITION: voyagerparams
+# ==============================================================================
+# A resource module: the local checkout of the public repository
+# laurenkolinger/voyagerparams, which holds every version of the Voyager 1 and
+# Voyager 2 analysis parameters as YAML files. It has no code of its own. The
+# Voyager 1 setup page reads it and Voyager tools writes it, both through
+# vicarius/modules/voyager_tools/github_repo/voyagertools/paramsstore.py.
+# The versioning rule and the file layout are in README.md beside this file.
+# ==============================================================================
+
+name: "voyagerparams"
+display_name: "voyagerparams"
+tags: ["3D"]
+hidden: true
+hidden_reason: "Parameter versions are chosen on the Voyager 1 setup page and edited in Voyager tools; this checkout holds YAML files and nothing to launch."
+version: "0.1.0"
+description: "Versioned analysis parameters for Voyager 1 (default v1.0.0) and Voyager 2 (draft v0.1.0), kept as YAML files in a public repository so the exact parameters of every run are on record and linkable from the atlas."
+author: "Lauren Olinger"
+created: "2026-09-04"
+
+# A resource: no processing stage, no run folders, no launch.
+type: "resource"
+
+inputs: []
+
+# No outputs: the files here are inputs to Voyager 1 and Voyager 2, not
+# datasets bound to descriptors.
+outputs: []
+
+runtime:
+  python_version: ">=3.10"
+  gpu_required: false
+  dependencies: "none; the reader and writer library lives in voyager_tools (pyyaml)"
+  estimated_time: "n/a"
+
+notes: |
+  Layout: <phase>/versions/v<X.Y.Z>.yaml (defaults, newest wins the DEFAULT
+  pointer), <phase>/branches/<slug>/v<X.Y.Z>.yaml (named variants),
+  <phase>/custom/<run_id>.yaml (the exact set one run used), <phase>/DEFAULT
+  (one line naming the default version). Phases are voyager1 and voyager2.
+  Every file opens with a comment header (params_version, phase, kind,
+  description, saved_at, saved_by) that paramsstore.py reads; the body is the
+  analysis_params.yaml the module consumes, comments included.
