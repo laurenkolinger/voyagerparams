@@ -4,7 +4,8 @@
 # A resource module: the local checkout of the public repository
 # laurenkolinger/voyagerparams, which holds every version of the Voyager 1 and
 # Voyager 2 analysis parameters as YAML files. It has no code of its own. The
-# Voyager 1 setup page reads it and Voyager tools writes it, both through
+# Voyager 1 and Voyager 2 setup pages read it and the Atlas control panel
+# (voyager_tools) writes it, all through
 # vicarius/modules/voyager_tools/github_repo/voyagertools/paramsstore.py.
 # The versioning rule and the file layout are in README.md beside this file.
 # ==============================================================================
@@ -13,7 +14,7 @@ name: "voyagerparams"
 display_name: "voyagerparams"
 tags: ["3D"]
 hidden: true
-hidden_reason: "Parameter versions are chosen on the Voyager 1 setup page and edited in Voyager tools; this checkout holds YAML files and nothing to launch."
+hidden_reason: "Parameter versions are chosen on the Voyager 1 and Voyager 2 setup pages and edited in the Atlas control panel; this checkout holds YAML files and nothing to launch."
 version: "0.1.0"
 description: "Versioned analysis parameters for Voyager 1 (default v1.0.0) and Voyager 2 (draft v0.1.0), kept as YAML files in a public repository so the exact parameters of every run are on record and linkable from the atlas."
 author: "Lauren Olinger"
